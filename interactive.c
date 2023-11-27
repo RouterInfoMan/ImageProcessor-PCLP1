@@ -21,8 +21,11 @@ int in_range(int idx, int n, int N) {
 
 
 void free_filter_data(filter_data_t **data, int alloc_cnt) {
-    for (int i = 0; i < alloc_cnt; i++) {
-        free((*data)[i].filter);
+    for (int k = 0; k < alloc_cnt; k++) {
+        for (int i = 0; i < (*data)[k].sz; i++) {
+            free((*data)[k].filter[i]);
+        }
+        free((*data)[k].filter);
     }
     free(*data);
 }
@@ -205,9 +208,12 @@ int main()
                 continue;
             }
 
+            for (int i = 0; i < filter_arr[idxf].sz; i++) {
+                free(filter_arr[idxf].filter[i]);
+            }
             free(filter_arr[idxf].filter);
 
-            for (int i = idxf; i < max_filter_cnt - 1; i++) {
+            for (int i = idxf; i < current_filter_cnt - 1; i++) {
                 filter_arr[i] = filter_arr[i + 1];
             }
             current_filter_cnt--;
@@ -225,7 +231,7 @@ int main()
 
             free_image(image_arr[idxi].img, image_arr[idxi].N, image_arr[idxi].M);
 
-            for (int i = idxi; i < max_img_cnt - 1; i++) {
+            for (int i = idxi; i < current_img_cnt - 1; i++) {
                 image_arr[i] = image_arr[i + 1];
             }
             current_img_cnt--;

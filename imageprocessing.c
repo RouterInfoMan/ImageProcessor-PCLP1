@@ -72,9 +72,9 @@ int ***rotate_left(int ***image, int N, int M) {
 // TODO Task 3
 int ***crop(int ***image, int N, int M, int x, int y, int h, int w) {
 	int ***new_image = alloc_image(h, w);
-    for (int i = x; i < x + h; i++) {
-        for (int j = y; j < y + w; j++) {
-            swap_ptrs((void **)&new_image[i - x][j - y], (void **)&image[i][j]);
+    for (int i = y; i < y + h; i++) {
+        for (int j = x; j < x + w; j++) {
+            swap_ptrs((void **)&new_image[i - y][j - x], (void **)&image[i][j]);
         }
     }
     free_image(image, N, M);
@@ -97,13 +97,13 @@ int ***extend(int ***image, int N, int M, int rows, int cols, int new_R, int new
 
 // TODO Task 5
 int ***paste(int ***image_dst, int N_dst, int M_dst, int *** image_src, int N_src, int M_src, int x, int y) {
-	int minN = N_dst - x > N_src ? N_src : N_dst - x;
-    int minM = M_dst - y > M_src ? M_src : M_dst - y;
+	int minN = N_dst - y > N_src ? N_src : N_dst - y;
+    int minM = M_dst - x > M_src ? M_src : M_dst - x;
 
     for (int i = 0; i < minN; i++) {
         for (int j = 0; j < minM; j++) {
             for (int k = 0; k < 3; k++) {
-                image_dst[i+x][j+y][k] = image_src[i][j][k];
+                image_dst[i+y][j+x][k] = image_src[i][j][k];
             }
         }
     } 
@@ -177,6 +177,8 @@ void read_from_bmp(int ***pixel_matrix, int N, int M, const char *path) {
     unsigned char header[54];
     fread(header, sizeof(unsigned char), 54, file);
 
+    int padding = (4 - (M * 3) % 4) % 4;
+
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
             unsigned char color[3];
@@ -185,6 +187,7 @@ void read_from_bmp(int ***pixel_matrix, int N, int M, const char *path) {
             pixel_matrix[N-i-1][j][1] = (int)color[1]; // Green
             pixel_matrix[N-i-1][j][2] = (int)color[0]; // Blue
         }
+        fseek(file, padding, SEEK_CUR);
     }
 
     fclose(file);
@@ -216,13 +219,14 @@ void write_to_bmp(int ***pixel_matrix, int N, int M, const char *path) {
     };
 
     int padding = (4 - (M * 3) % 4) % 4;
-    int fileSize = 54 + 3 * N * M;
+    int fileSize = 54 + (3 * M + padding) * N;
     *(int *)&header[2] = fileSize;
     *(int *)&header[18] = M;
     *(int *)&header[22] = N;
 
     fwrite(header, sizeof(unsigned char), 54, file);
 
+    unsigned char pad[3] = {0, 0, 0};
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
             unsigned char color[3];
@@ -231,9 +235,7 @@ void write_to_bmp(int ***pixel_matrix, int N, int M, const char *path) {
             color[0] = (unsigned char)(pixel_matrix[N-i-1][j][2]); // Blue
             fwrite(color, sizeof(unsigned char), 3, file);
         }
-        for (int k = 0; k < padding; k++) {
-            fputc(0, file);
-        }
+        fwrite(pad, sizeof(unsigned char), padding, file);
     }
 
     fclose(file);

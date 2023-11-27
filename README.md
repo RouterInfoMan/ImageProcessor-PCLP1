@@ -40,7 +40,16 @@ Then you will be able to input your commands, and edit your images!
 | df | index_filter | Deletes filter at specified index |
 | di | index_img | Deletes image at specified index |
 
-Note: Deleting a filter/image, changes the next filters/images' index!
+## Notes
+Deleting a filter/image, changes the next filters/images' index!
+Example:
+```
+l x y img1.bmp
+l x y img2.bmp
+di 0
+```
+img2.bmp will now have index 0!!
+
 
 
  

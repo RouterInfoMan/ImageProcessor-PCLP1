@@ -119,7 +119,7 @@ int is_within_borders(int x, int y, int N, int M) {
         return 0;
     return 1;
 }
-void apply_filter_to_one(int ***image, int x, int y, int N, int M, float **filter, int filter_size) {
+void apply_filter_to_one(int ***output_image, int ***input_image, int x, int y, int N, int M, float **filter, int filter_size) {
     int newN = x - filter_size / 2;
     int newM = y - filter_size / 2;
 
@@ -130,7 +130,7 @@ void apply_filter_to_one(int ***image, int x, int y, int N, int M, float **filte
         for (int j = newM; j < newM + filter_size; j++) {
             if (is_within_borders(i, j, N, M)) {
                 for (int k = 0; k < 3; k++) {
-                    color[k] = image[i][j][k];
+                    color[k] = input_image[i][j][k];
                 }
             } else {
                 color[0] = color[1] = color[2] = 0;
@@ -147,18 +147,22 @@ void apply_filter_to_one(int ***image, int x, int y, int N, int M, float **filte
         if (color_total[k] > 255) {
             color_total[k] = 255;
         }
-        image[x][y][k] = (int)color_total[k];
+        output_image[x][y][k] = (int)color_total[k];
     }
 }
 
 // TODO Task 6
 int ***apply_filter(int ***image, int N, int M, float **filter, int filter_size) {
+    int ***output = alloc_image(N, M);
+
 	for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            apply_filter_to_one(image, i, j, N, M, filter, filter_size);
+            apply_filter_to_one(output, image, i, j, N, M, filter, filter_size);
         }
     }
-    return image;
+
+    free_image(image, N, M);
+    return output;
 }
 
 

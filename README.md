@@ -1,7 +1,7 @@
 
 # ImageProcessor-PCLP1
 
-A lightweight console-based image processor written in C for .bmp files.  
+A lightweight console-based interactive image processor written in C that handles .bmp files.  
 This assignment was given in the PCLP1 course for the academic year 2023-2024, CB series, UPB ACS CTI.
 
 
@@ -14,7 +14,7 @@ git clone https://github.com/RouterInfoMan/ImageProcessor-PCLP1.git
 Use the following ```make``` command in the repo folder to compile the program:
 
 ```
-  make interactive
+make interactive
 ```
     
 Then just run the program like this:
